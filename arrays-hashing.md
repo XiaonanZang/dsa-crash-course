@@ -264,6 +264,49 @@ the max value with `max(d, key=d.get)`.
 ⚠️ Do **not** add or delete keys *while* looping `d.items()` — it raises "dictionary changed size
 during iteration." If you must, loop over a snapshot: `for k, v in list(d.items()):`.
 
+### set — the full operation set
+
+A `set` stores **unique, unordered, hashable** elements with O(1) add / membership / remove. It is a
+`dict` with keys but no values.
+
+```python
+s = set()                   # empty  (NOTE: {} is an empty DICT, not a set)
+s = {1, 2, 3}               # literal
+s = set([1, 2, 2, 3])       # from a list -> {1, 2, 3}  (dedups automatically)
+
+# --- add / remove ---
+s.add(x)                    # insert; returns None; duplicate = silent no-op (no error)
+s.discard(x)                # remove if present; does NOTHING if missing (safe)
+s.remove(x)                 # remove; raises KeyError if x is missing
+s.pop()                     # remove & return an ARBITRARY element (unordered)
+
+# --- query ---
+x in s                      # O(1) membership
+len(s)                      # size
+```
+
+**Elements must be hashable (immutable):** numbers, strings, tuples are OK; a `list` is not.
+Use a tuple for a coordinate: `visited.add((r, c))`.
+
+Because `add()` gives no signal on a duplicate, test first when you need to detect one:
+
+```python
+if x in seen: ...           # ask before adding
+seen.add(x)
+# or by size:
+before = len(s); s.add(x); is_new = len(s) > before
+```
+
+**Set algebra** (great for "common / missing / distinct" questions):
+
+```python
+a | b      # union         -- in a OR b
+a & b      # intersection  -- in a AND b   (e.g. common elements of two arrays)
+a - b      # difference    -- in a but NOT b
+a ^ b      # symmetric diff -- in exactly one of them
+list(set(nums))   # dedup a list in one line
+```
+
 ---
 
 ## 1. Two Sum — the "seen so far" map
