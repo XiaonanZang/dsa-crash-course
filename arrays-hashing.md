@@ -14,6 +14,98 @@ scan drops to O(n).
 
 ---
 
+## 0. The list — where the data starts
+
+Before any hashing, you need fluency with the `list` — it is Python's dynamic array (`std::vector`),
+the type the input arrives in and the one you build most answers into. It also doubles as your
+**stack** (`append` / `pop`).
+
+### Creating / initializing
+
+```python
+v = []                             # empty
+v = [1, 2, 3]                      # literal
+v = [0] * n                        # n zeros -> [0,0,0,...]  (init a result/count array)
+v = list(range(n))                 # [0, 1, ..., n-1]
+v = list(range(1, n + 1))          # [1, 2, ..., n]
+grid = [[0] * C for _ in range(R)] # R x C of zeros -- the CORRECT 2D init
+```
+
+⚠️ **2D trap:** `[[0]*C]*R` makes every row the *same* object, so editing one row edits all of them.
+Always use the `for _ in range(R)` comprehension form for a grid.
+
+### Access & slicing
+
+```python
+v[0]      v[-1]        # first, last  (negative index counts from the end)
+v[i:j]                 # sublist from i up to (not including) j
+v[:k]     v[k:]        # first k / everything from index k on
+v[::-1]               # reversed copy  (palindrome check, reverse without a loop)
+v[::2]                # every other element
+```
+
+`v[-1]` for "last element" is the idiom you reach for constantly (it is also your stack `top`).
+
+### Mutating
+
+```python
+v.append(x)    # add to end            O(1)   -- also stack push
+v.pop()        # remove & return last  O(1)   -- stack pop
+v.pop(0)       # remove FIRST          O(n)   <-- avoid in loops; use deque for a queue
+v.insert(i, x) # insert at index i     O(n)
+v[i] = x       # overwrite in place
+v.sort()       # sort in place, ascending
+v.reverse()    # reverse in place
+```
+
+### Iterating — the three idioms that cover ~90% of loops
+
+```python
+for x in v:                  # value only
+    ...
+for i, x in enumerate(v):    # index AND value -- no C-style for loop needed
+    ...
+for a, b in zip(A, B):       # two lists in lockstep
+    ...
+for i in range(len(v)):      # raw index -- only when you need v[i] and v[i+1], etc.
+    ...
+```
+
+### Built-ins that save you a loop
+
+```python
+len(v)     sum(v)     min(v)     max(v)
+sorted(v)  # returns a NEW sorted list (v unchanged)
+reversed(v)# iterator; wrap in list() if you need a list
+```
+
+### Comprehensions — build a list from another in one line
+
+```python
+squares = [x * x for x in v]                  # map
+evens   = [x for x in v if x % 2 == 0]        # filter
+labeled = [(i, x) for i, x in enumerate(v)]   # pair up
+flat    = [x for row in grid for x in row]    # flatten a 2D grid
+```
+
+Comprehensions replace the "empty list, loop, append" boilerplate — shorter and faster.
+
+### One-screen list cheat
+
+```
+init          v=[];  [0]*n;  [[0]*C for _ in range(R)];  list(range(n))
+first / last  v[0] / v[-1]
+slice         v[i:j]  v[:k]  v[k:]  v[::-1] (reverse)
+grow / shrink append / pop  (O(1));  pop(0) / insert  (O(n) -- avoid)
+loop          for x in v | for i,x in enumerate(v) | for a,b in zip(A,B)
+builtins      len  sum  min  max  sorted  reversed
+comprehension [f(x) for x in v if cond]
+```
+
+With the list under your fingers, the hash containers below are what turn an O(n²) scan into O(n).
+
+---
+
 ## The three containers
 
 | Python | Role | C++ analog | Ops you actually use |
