@@ -152,13 +152,19 @@ list(z)   # []   <- already exhausted; list() it once and reuse the list
 ### Comprehensions — build a list from another in one line
 
 ```python
-squares = [x * x for x in v]                  # map
-evens   = [x for x in v if x % 2 == 0]        # filter
-labeled = [(i, x) for i, x in enumerate(v)]   # pair up
+squares = [x * x for x in v]                  # map: transform every element
+evens   = [x for x in v if x % 2 == 0]        # filter: keep some elements
+pos_idx = [i for i, x in enumerate(v) if x > 0]  # transform + filter together
 flat    = [x for row in grid for x in row]    # flatten a 2D grid
 ```
 
-Comprehensions replace the "empty list, loop, append" boilerplate — shorter and faster.
+Comprehensions replace the "empty list, loop, append" boilerplate — but only reach for one when it
+actually **transforms or filters**. If you just want the raw pairs, don't wrap enumerate in a
+comprehension that rebuilds the same tuple — call the built-in directly:
+
+```python
+[(i, x) for i, x in enumerate(v)]   ==   list(enumerate(v))   # the comprehension does nothing; use the right side
+```
 
 ### One-screen list cheat
 
