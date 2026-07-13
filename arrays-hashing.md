@@ -210,6 +210,10 @@ defaultdict(list)           # missing key -> []  (bucketing / adjacency lists)
 
 ## 1. Two Sum — the "seen so far" map
 
+> **Problem:** Given an integer array `nums` and an integer `target`, return the **indices** of the
+> two numbers that add up to `target`. Exactly one solution exists, and you may not use the same
+> element twice. Example: `nums=[2,7,11,15], target=9` → `[0, 1]` (because `2 + 7 = 9`).
+
 The archetype for the whole pattern. Teaches the **one-pass dict**: store each value as you go so a
 future element can look back and find its complement in O(1).
 
@@ -231,6 +235,9 @@ def two_sum(nums, target):
 ---
 
 ## 2. Contains Duplicate — the set
+
+> **Problem:** Given an integer array `nums`, return `True` if any value appears **at least twice**,
+> and `False` if every element is distinct. Example: `[1,2,3,1]` → `True`; `[1,2,3,4]` → `False`.
 
 Teaches **set for membership and dedup**.
 
@@ -254,6 +261,10 @@ def contains_duplicate_short(nums):
 ---
 
 ## 3. Valid Anagram — Counter compared directly
+
+> **Problem:** Given two strings `s` and `t`, return `True` if `t` is an **anagram** of `s` (same
+> characters with the same counts, reordered). Example: `s="anagram", t="nagaram"` → `True`;
+> `s="rat", t="car"` → `False`.
 
 Teaches `Counter` for frequency and the fact that **two Counters compare with `==`**. This is the
 single biggest time-saver for rusty candidates: no manual counting loops.
@@ -285,6 +296,10 @@ def is_anagram_manual(s, t):
 
 ## 4. Group Anagrams — defaultdict with a computed key
 
+> **Problem:** Given a list of strings `strs`, group the ones that are anagrams of each other.
+> Return a list of groups (order does not matter). Example: `["eat","tea","tan","ate","nat","bat"]`
+> → `[["eat","tea","ate"], ["tan","nat"], ["bat"]]`.
+
 Teaches `defaultdict(list)` to **bucket items by a derived key** with no existence check.
 
 ```python
@@ -305,6 +320,9 @@ def group_anagrams(strs):
 ---
 
 ## 5. Top K Frequent — Counter meets the heap
+
+> **Problem:** Given an integer array `nums` and an integer `k`, return the `k` **most frequent**
+> elements (any order). Example: `nums=[1,1,1,2,2,3], k=2` → `[1, 2]`.
 
 Teaches `Counter.most_common(k)`, a one-liner that hides a heap, plus the bucket-sort alternative.
 
@@ -337,6 +355,10 @@ def top_k_frequent_bucket(nums, k):
 ---
 
 ## 6. Product of Array Except Self — the prefix/suffix trick
+
+> **Problem:** Given an integer array `nums`, return an array `res` where `res[i]` equals the
+> **product of every element except `nums[i]`** — computed **without division** and in O(n).
+> Example: `nums=[1,2,3,4]` → `[24, 12, 8, 6]`.
 
 Teaches an **array-only** technique (no division allowed): build the answer from a left pass and a
 right pass. Shows up because it is the same prefix-accumulation idea used later in intervals.
