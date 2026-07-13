@@ -117,12 +117,36 @@ for i in range(len(v)):      # raw index -- only when you need v[i] and v[i+1], 
     ...
 ```
 
-### Built-ins that save you a loop
+### Built-ins, grouped by what they RETURN
+
+The important distinction is not "does it help me loop" but "what type comes back," because that
+decides whether you can use the result directly or must wrap it in `list()`.
 
 ```python
-len(v)     sum(v)     min(v)     max(v)
-sorted(v)  # returns a NEW sorted list (v unchanged)
-reversed(v)# iterator; wrap in list() if you need a list
+# 1. return a SCALAR (one value)
+len(v)   sum(v)   min(v)   max(v)      # also any(v), all(v) -> bool
+
+# 2. return a NEW LIST (already materialized -- use, index, print directly)
+sorted(v)                              # v unchanged; sorted CANNOT be lazy (must see all first)
+
+# 3. return a LAZY ITERATOR (great for looping; wrap in list() only if you need a real list)
+reversed(v)    enumerate(v)    zip(A, B)    map(f, v)    filter(f, v)    range(n)
+```
+
+So `reversed` belongs with `enumerate` and `zip` (group 3), **not** with `len/sum/sorted`. All of
+group 3 stream elements one at a time:
+
+```python
+for x in reversed(v): ...          # no list() needed -- looping consumes the iterator
+w = list(reversed(v))              # list() only when you need a standalone list to keep/index
+```
+
+⚠️ Iterators are **single-use** — consume one twice and the second time is empty:
+
+```python
+z = zip(A, B)
+list(z)   # [(a0,b0), ...]
+list(z)   # []   <- already exhausted; list() it once and reuse the list
 ```
 
 ### Comprehensions — build a list from another in one line
