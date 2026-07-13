@@ -206,6 +206,64 @@ defaultdict(int)            # missing key -> 0   (counting)
 defaultdict(list)           # missing key -> []  (bucketing / adjacency lists)
 ```
 
+### dict — the full operation set
+
+```python
+d = {}                      # empty
+d = {"a": 1, "b": 2}        # literal
+d = dict(a=1, b=2)          # same thing via keyword args
+
+# --- write / read ---
+d[key] = val                # insert or overwrite
+d[key]                      # read -> val   (raises KeyError if key missing!)
+d.get(key)                  # read -> val, or None if missing (no error)
+d.get(key, 0)               # read -> val, or 0 if missing  (the safe counting idiom)
+d.setdefault(key, [])       # get key, inserting [] first if it was missing
+
+# --- membership / size ---
+key in d                    # True/False, O(1)  (checks KEYS, not values)
+len(d)                      # number of entries
+
+# --- delete ---
+del d[key]                  # remove an entry (KeyError if missing)
+d.pop(key, None)            # remove & return val, or None if missing (safe)
+
+# --- update / merge ---
+d.update({"c": 3})          # add/overwrite from another dict
+```
+
+### The three iteration views (`.keys()` / `.values()` / `.items()`)
+
+A dict stores key→val entries; how you loop it decides what you get back:
+
+```python
+d = {"a": 1, "b": 2, "c": 3}
+
+for k in d:            # iterating a dict directly gives KEYS
+    ...                #   k = "a", "b", "c"
+for k in d.keys():     # same as above, explicit
+    ...
+for v in d.values():   # just the VALUES
+    ...                #   v = 1, 2, 3
+for k, v in d.items(): # (key, val) TUPLES  <- unpack both at once
+    print(k, v)        #   "a" 1  /  "b" 2  /  "c" 3
+```
+
+`.items()` is the one you reach for most: it hands each entry back as a `(key, val)` tuple, and
+`for k, v in d.items()` unpacks it in place. Turning a dict into a list of pairs is just:
+
+```python
+list(d.items())        # [("a", 1), ("b", 2), ("c", 3)]
+list(d.keys())         # ["a", "b", "c"]
+list(d.values())       # [1, 2, 3]
+```
+
+Common uses: sort entries by value with `sorted(d.items(), key=lambda kv: kv[1])`; find the key with
+the max value with `max(d, key=d.get)`.
+
+⚠️ Do **not** add or delete keys *while* looping `d.items()` — it raises "dictionary changed size
+during iteration." If you must, loop over a snapshot: `for k, v in list(d.items()):`.
+
 ---
 
 ## 1. Two Sum — the "seen so far" map
