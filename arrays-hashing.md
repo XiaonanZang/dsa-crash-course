@@ -414,7 +414,16 @@ def group_anagrams(strs):
     return list(groups.values())
 ```
 
-- `sorted(w)` returns a list of characters; `''.join(...)` glues them into a hashable string key.
+- **Why `''.join(sorted(w))` and not just `sorted(w)`?** `sorted(w)` returns a **list**, and lists
+  are **unhashable** — they cannot be dict keys or set elements (`groups[['a','e','t']]` → `TypeError:
+  unhashable type: 'list'`). A key must be immutable/hashable, so wrap the sorted characters into a
+  hashable type first. Two valid keys:
+  ```python
+  key = ''.join(sorted(w))    # -> "aet"          (string -- hashable)  ✔
+  key = tuple(sorted(w))      # -> ('a','e','t')  (tuple  -- hashable)  ✔ also fine
+  ```
+  All anagrams collapse to the same signature (`"eat"`, `"tea"`, `"ate"` → `"aet"`). Same reason a
+  coordinate goes into a set as a `(r, c)` **tuple**, never a `[r, c]` list.
 - With `defaultdict(list)`, `groups[key].append(...)` works even for a brand-new key.
 - A faster key (avoids sorting) is a 26-length count tuple: `key = tuple(count of each letter)`.
 
