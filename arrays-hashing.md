@@ -434,32 +434,48 @@ def group_anagrams(strs):
 > **Problem:** Given an integer array `nums` and an integer `k`, return the `k` **most frequent**
 > elements (any order). Example: `nums=[1,1,1,2,2,3], k=2` → `[1, 2]`.
 
-Teaches `Counter.most_common(k)`, a one-liner that hides a heap, plus the bucket-sort alternative.
+Teaches the **two-step shape** of "top k" problems — (1) **count** with a plain map, (2) **rank**
+by frequency — and the **bucket** trick that makes the ranking O(n) instead of O(n log k).
+
+**Primary version — plain `dict` + bucket, O(n).** Nothing but a map, a list of buckets, and two
+loops. This is the one to be able to write cold:
 
 ```python
-from collections import Counter
-
 def top_k_frequent(nums, k):
-    return [val for val, cnt in Counter(nums).most_common(k)]
-    # most_common(k) returns the top-k (value, count) pairs, highest count first;
-    # the comprehension unpacks each pair and keeps just the value.
-```
+    # 1. count: plain map  value -> frequency
+    count = {}
+    for x in nums:
+        count[x] = count.get(x, 0) + 1              # get(x, 0) = current count or zero
 
-O(n log k) bucket-sort version — worth knowing since it is the "can you do better" follow-up:
-
-```python
-def top_k_frequent_bucket(nums, k):
-    count = Counter(nums)
-    buckets = [[] for _ in range(len(nums) + 1)]   # index = frequency
+    # 2. bucket by frequency: index = frequency (a frequency can be at most n)
+    buckets = [[] for _ in range(len(nums) + 1)]
     for val, freq in count.items():
-        buckets[freq].append(val)                  # place value at its frequency
+        buckets[freq].append(val)                   # file each value under its frequency
+
+    # 3. walk high frequency -> low, take the first k
     result = []
-    for freq in range(len(buckets) - 1, 0, -1):    # walk high freq -> low
+    for freq in range(len(buckets) - 1, 0, -1):
         for val in buckets[freq]:
             result.append(val)
             if len(result) == k:
                 return result
     return result
+```
+
+Why it is O(n): counting is O(n), bucketing places each value in one pass, and walking the buckets
+is O(n) — no sort, no heap, so no `log` factor. The trick works because the sort key (frequency) is
+a bounded integer ≤ n, so you can *index* by it instead of *comparing*.
+
+**Shorthand version — `Counter.most_common(k)`, O(n log k).** Same idea, but `most_common` uses a
+heap internally, adding the `log k`. One line; perfectly acceptable in an interview — reach for the
+bucket version only when asked "can you do strictly O(n)?":
+
+```python
+from collections import Counter
+
+def top_k_frequent_short(nums, k):
+    return [val for val, cnt in Counter(nums).most_common(k)]
+    # Counter(nums) == the plain count loop above; most_common(k) does the ranking (heap).
 ```
 
 ---
