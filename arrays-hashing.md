@@ -31,8 +31,54 @@ v = list(range(1, n + 1))          # [1, 2, ..., n]
 grid = [[0] * C for _ in range(R)] # R x C of zeros -- the CORRECT 2D init
 ```
 
-⚠️ **2D trap:** `[[0]*C]*R` makes every row the *same* object, so editing one row edits all of them.
-Always use the `for _ in range(R)` comprehension form for a grid.
+⚠️ **The 2D trap.** `[[0]*C]*R` makes all R rows *one shared list object*, so an edit to any cell
+appears at that column in **every** row:
+
+```python
+grid = [[0]*3]*2          # looks like [[0,0,0],[0,0,0]] -- but both rows are ONE list
+grid[1][1] = 5
+print(grid)               # [[0, 5, 0], [0, 5, 0]]   <- row 0 changed too!
+```
+
+The fix is the comprehension form, which runs `[0]*C` **fresh for each row** so the rows are
+independent:
+
+```python
+grid = [[0]*C for _ in range(R)]   # R independent rows -- always use this for a grid
+```
+
+Rule of thumb: `*` is safe only on the **innermost line, for a row of scalars** (`[0]*C`). Every
+layer *above* that must be a comprehension.
+
+### 3D and beyond
+
+Same rule, one comprehension per dimension, built inside-out:
+
+```python
+row1D  = [0]*H                                          # H
+grid2D = [[0]*C for _ in range(R)]                      # R x C     -> grid[r][c]
+cube3D = [[[0]*H for _ in range(C)] for _ in range(R)]  # R x C x H -> cube[r][c][h]
+```
+
+This is safe because only the innermost `[0]*H` uses `*`; the two outer layers are comprehensions,
+so nothing is shared. (`[[[0]*H]*C]*R` would alias *both* the middle and outer levels — never do that.)
+
+### When NOT to allocate a dense grid
+
+By 3D, pause and ask *do I really need a dense array?* If the space is huge but mostly empty, a
+`dict` keyed by a tuple is cleaner and cheaper — you allocate only the cells you touch:
+
+```python
+seen = {}                          # sparse "grid"
+seen[(r, c, h)] = 1                # tuple key -- no R*C*H allocation
+if (r, c, h) in seen: ...          # O(1) lookup
+
+visited = set()                    # when you only need presence, not a value
+visited.add((r, c))
+```
+
+Dense 3D is right for real DP (state = position plus a couple of small parameters); a tuple-keyed
+`dict`/`set` is right when the grid is large and sparse. "Does this dimension earn its allocation?"
 
 ### Access & slicing
 
