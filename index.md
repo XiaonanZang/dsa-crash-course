@@ -17,7 +17,7 @@ built on arrays and hashing, so those come first as the substrate.
 | # | Pattern | What it covers | Priority |
 |---|---|---|---|
 | 0 | [C++ → Python cheat sheet](cpp-to-python.html) | Translate DS&A muscle memory from C++ to Python idioms | start here |
-| 1 | Arrays & Hashing | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | foundation |
+| 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | foundation |
 | 2 | Graphs I — BFS / DFS / components | adjacency list, `visited`, traversal, connected components | core |
 | 3 | Grid BFS / DFS | matrix as an implicit graph: islands, flood fill | core |
 | 4 | Graphs II — topological sort + Dijkstra | ordering with dependencies, shortest path with a heap | core |
