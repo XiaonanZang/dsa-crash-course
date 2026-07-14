@@ -18,12 +18,16 @@ built on arrays and hashing, so those come first as the substrate.
 |---|---|---|---|
 | 0 | [C++ → Python cheat sheet](cpp-to-python.html) | Translate DS&A muscle memory from C++ to Python idioms | start here |
 | 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | foundation |
-| 2 | Graphs I — BFS / DFS / components | adjacency list, `visited`, traversal, connected components | core |
-| 3 | Grid BFS / DFS | matrix as an implicit graph: islands, flood fill | core |
-| 4 | Graphs II — topological sort + Dijkstra | ordering with dependencies, shortest path with a heap | core |
-| 5 | Geometry / intervals | points, polylines, distances, merge intervals | high |
-| 6 | Binary search | sorted arrays + search-on-answer-space | foundation |
-| 7 | Heap / top-k | `heapq`, k-largest, k-closest, merge-k | high |
+| 2 | [Graphs I — traversal & connected components](graphs-1.html) | adjacency list, `visited`, BFS/DFS, components, islands | ⭐ core |
+| 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ core |
+| 4 | Shortest path (Dijkstra) | weighted routing with a heap | core |
+| 5 | Grid BFS / DFS | matrix as an implicit graph: islands, flood fill | core |
+| 6 | Geometry / polylines | points, polylines, distances, merge intervals | high |
+| 7 | Binary search | sorted arrays + search-on-answer-space | foundation |
+| 8 | Heap / top-k | `heapq`, k-largest, k-closest, merge-k | high |
+
+*Order reflects the mapping/autonomy JD: lane/road-network **graph construction, connectivity, and
+topology** are the interview-day core, so graphs lead.*
 
 *Foundations (arrays/hashing, binary search) appear in almost every problem; the graph family is
 the interview-day core when the domain is networks and topology.*
