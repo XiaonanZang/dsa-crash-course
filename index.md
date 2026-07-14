@@ -20,8 +20,8 @@ built on arrays and hashing, so those come first as the substrate.
 | 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | foundation |
 | 2 | [Graphs I — traversal & connected components](graphs-1.html) | adjacency list, `visited`, BFS/DFS, components, islands | ⭐ core |
 | 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ core |
-| 4 | Shortest path (Dijkstra) | weighted routing with a heap | core |
-| 5 | Grid BFS / DFS | matrix as an implicit graph: islands, flood fill | core |
+| 4 | [Shortest path (Dijkstra)](shortest-path-dijkstra.html) | weighted routing with a min-heap frontier | core |
+| 5 | [Grid BFS / DFS](grid-bfs-dfs.html) | matrix as an implicit graph: shortest path, islands, flood fill, multi-source | core |
 | 6 | Geometry / polylines | points, polylines, distances, merge intervals | high |
 | 7 | Binary search | sorted arrays + search-on-answer-space | foundation |
 | 8 | Heap / top-k | `heapq`, k-largest, k-closest, merge-k | high |
