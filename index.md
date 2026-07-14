@@ -25,13 +25,13 @@ Two columns, two axes:
 | # | Pattern | What it covers | Likelihood | Drill |
 |---|---|---|---|---|
 | 0 | [C++ → Python cheat sheet](cpp-to-python.html) | Translate DS&A muscle memory from C++ to Python idioms | reference | — |
-| 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | must-know · prereq | done ✓ |
+| 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | must-know · prereq | drill |
 | 2 | [Graphs I — traversal & connected components](graphs-1.html) | adjacency list, `visited`, BFS/DFS, components, islands | ⭐ must-know | must-drill |
 | 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ must-know | must-drill |
 | 4 | [Shortest path (Dijkstra)](shortest-path-dijkstra.html) | weighted routing with a min-heap frontier (+ A*) | likely | drill |
 | 5 | [Grid BFS / DFS](grid-bfs-dfs.html) | matrix as an implicit graph: shortest path, islands, flood fill, multi-source | likely | drill |
 | 6 | [Geometry / polylines](geometry-polylines.html) | points, polylines, point-to-segment, Chamfer (map-eval), merge intervals | likely | drill |
-| 7 | [Binary search](binary-search.html) | sorted arrays + search-on-answer-space | possible · foundation | **must-drill** |
+| 7 | [Binary search](binary-search.html) | sorted arrays + search-on-answer-space | possible · foundation | must-drill |
 | 8 | [Two Pointers](two-pointers.html) | converging / slow-fast on (usually sorted) arrays | possible | optional |
 | 9 | [Sliding Window](sliding-window.html) | contiguous subarray/substring, grow/shrink window | possible | drill |
 | 10 | [Stack](stack.html) | matching / nesting, monotonic stack (next-greater) | possible | optional |
