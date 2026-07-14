@@ -179,7 +179,59 @@ the limit — same as you would reason about stack depth in C++.
 
 ---
 
-## 10. The one-screen summary
+## 10. The idiom slips that bite under a clock
+
+These aren't algorithm mistakes, they're the Python-idiom slips that surface when you write cold with
+your hands cold. They cost real minutes chasing a `TypeError` when the approach was already right.
+Read them, then watch for them the moment you drill.
+
+**Call vs subscript — methods need `()`, not `[]`.**
+```python
+q.popleft()          # RIGHT — it's a method call
+q.popleft            # wrong — this is the method OBJECT, you never called it
+lst.append(x)        # RIGHT
+lst.append[x]        # wrong — TypeError: 'builtin_function_or_method' is not subscriptable
+```
+`[]` means "index into"; `()` means "call". A method is called. When in doubt: does this *do* something? Then it needs `()`.
+
+**Container init vs append — `deque()`/`list()`/`extend()` ITERATE their argument; `append()` takes one element.**
+```python
+deque([(r, c)])      # RIGHT — a list holding one tuple -> deque has one coordinate
+deque((r, c))        # wrong — iterates the tuple -> deque holds two ints r and c
+q.append((nr, nc))   # RIGHT — the tuple goes in whole, as one element
+q.append([(nr, nc)]) # wrong — a list-wrapping-a-tuple goes in; next popleft can't unpack it
+```
+Rule: **if a call iterates its arg (`deque`, `list`, `extend`, `set`), wrap your item so iteration yields exactly it. If it takes one element (`append`, `push`), pass it bare.**
+
+**Iterate values vs indices — `for x in arr` gives VALUES, not positions.**
+```python
+for i in range(len(arr)):        # RIGHT when you need the index i
+    if arr[i] == 0: q.append(i)
+for i, v in enumerate(arr):      # RIGHT — index AND value
+    if v == 0: q.append(i)
+for x in arr:                    # gives the VALUE x; appending x is NOT the node id
+    if x == 0: q.append(x)       # bug: seeds the value 0, not the position
+```
+When you're seeding a queue/visited with **node ids** (in-degree-0 nodes, grid cells), you need the **index**. Reach for `enumerate` or `range(len(...))`, not a bare `for x in arr`.
+
+**Char grids hold strings, not ints.**
+```python
+if grid[r][c] == "1":     # RIGHT — LeetCode grids are often chars '1'/'0'
+if grid[r][c] == 1:       # wrong — silently always False; your whole scan finds nothing
+```
+
+**Bounds are inclusive-zero — use `>= 0`, not `> 0`.**
+```python
+if 0 <= nr < R and 0 <= nc < C:    # RIGHT — row 0 / col 0 are valid
+if nr > 0 and nc > 0:              # wrong — drops the entire first row and first column
+```
+
+*(These are the exact slips that recur across cold drills. The algorithm is rarely the problem; this
+list is. One read-through before you drill turns 4-bug runs into 1-bug runs.)*
+
+---
+
+## 11. The one-screen summary
 
 ```
 vector           -> list                      []           append / pop / [-1]
