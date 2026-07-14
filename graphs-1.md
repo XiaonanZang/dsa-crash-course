@@ -74,6 +74,49 @@ def bfs(graph, start):
 queue**, not when you pop it. If you wait until pop, the same node can be enqueued many times before
 it's ever processed.
 
+### Concrete trace — why marking on *pop* breaks
+
+Take a **hub** node `4` reachable from three predecessors `1, 2, 3`, all reachable from source `0`:
+
+```python
+graph = {0: [1, 2, 3], 1: [0, 4], 2: [0, 4], 3: [0, 4], 4: [1, 2, 3]}
+```
+
+**BUGGY version — `visited.add(node)` happens on POP, so the enqueue test is just
+`if nxt not in visited`:**
+
+```
+pop 0  -> mark {0}          ; look at 1,2,3 (none visited) -> enqueue 1,2,3   queue=[1,2,3]
+pop 1  -> mark {0,1}        ; look at 0(visited), 4(NOT visited*) -> enqueue 4  queue=[2,3,4]
+pop 2  -> mark {0,1,2}      ; look at 0(visited), 4(STILL not visited*) -> enqueue 4  queue=[3,4,4]
+pop 3  -> mark {0,1,2,3}    ; look at 0(visited), 4(STILL not visited*) -> enqueue 4  queue=[4,4,4]
+pop 4  -> mark {..,4}       ; process 4        queue=[4,4]
+pop 4  -> already visited   ; wasted work      queue=[4]
+pop 4  -> already visited   ; wasted work      queue=[]
+```
+
+`*` **This is the bug.** Node `4` is sitting *in the queue* but not yet *in `visited`* (visited only
+updates on pop). So when `2` and `3` look at `4`, it still reads as "undiscovered" and they enqueue
+it **again** — once per predecessor. `4` ends up in the queue **3 times**.
+
+**CORRECT version — `visited.add(nxt)` on ENQUEUE (the code above):**
+
+```
+pop 0  -> look at 1,2,3 -> mark+enqueue all      visited={0,1,2,3}  queue=[1,2,3]
+pop 1  -> look at 4 (not visited) -> mark+enqueue 4   visited={0,1,2,3,4}  queue=[2,3,4]
+pop 2  -> look at 4 -> ALREADY visited -> skip    queue=[3,4]
+pop 3  -> look at 4 -> ALREADY visited -> skip    queue=[4]
+pop 4  -> process                                  queue=[]
+```
+
+The instant node `1` enqueues `4`, it marks `4` visited — so `2` and `3` see it's already discovered
+and skip it. `4` is enqueued **exactly once**.
+
+**Why it matters:** a node gets re-enqueued once per predecessor, so on a dense graph that's up to
+**O(E) duplicate entries** — wasted time and memory, and without the "already visited" guard on pop
+it degenerates into reprocessing. The rule in one line: **a node is discovered the moment it enters
+the queue, so mark it there.**
+
 **BFS gives shortest hop-distance for free** — track a distance alongside:
 
 ```python
