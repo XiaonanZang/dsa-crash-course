@@ -167,6 +167,52 @@ grid where every move costs 1, that's still BFS, not Dijkstra.
 
 ---
 
+## 4. Extension — A* (Dijkstra + a heuristic)
+
+**A\* = Dijkstra that aims at a goal.** Dijkstra explores uniformly outward, ordered by `g(n)` =
+cost-so-far. A* adds a **heuristic** `h(n)` — an *estimate* of the remaining cost from `n` to the
+goal — and orders the heap by:
+
+```
+f(n) = g(n) + h(n)      # cost so far  +  estimated cost to go
+```
+
+So it prioritizes nodes heading *toward* the goal and expands far fewer of them. The code is a **tiny
+diff** from the Dijkstra template — heap key becomes `g + h`, and you stop when you pop the goal:
+
+```python
+import heapq
+def astar(graph, start, goal, h):
+    g = {start: 0}                       # cost from start  (Dijkstra's `dist`)
+    heap = [(h(start), start)]           # priority = f = g + h   (Dijkstra used just g)
+    while heap:
+        f, node = heapq.heappop(heap)
+        if node == goal:                 # A* targets ONE goal, stops when it pops it
+            return g[node]
+        for nxt, w in graph[node]:
+            ng = g[node] + w
+            if ng < g.get(nxt, float('inf')):
+                g[nxt] = ng
+                heapq.heappush(heap, (ng + h(nxt), nxt))   # push f = g + h
+    return -1
+```
+
+**The correctness rule:** the heuristic must be **admissible** — it must **never overestimate** the
+true remaining cost. Then A* is guaranteed optimal. Common admissible grid heuristics: **Manhattan**
+`|dr|+|dc|` (4-dir), **Chebyshev** `max(|dr|,|dc|)` (8-dir), **Euclidean** (any-angle).
+
+**Relationships to remember:**
+- **`h(n) = 0` for all n → A\* becomes exactly Dijkstra** (no goal info → uniform exploration). Dijkstra
+  is the special case of A* with a zero heuristic.
+- Better heuristic → fewer nodes expanded → faster to a single goal.
+- **Dijkstra computes distances to *all* nodes; A\* is optimized for reaching *one* goal.**
+
+A* is the workhorse of robot/AV path planning (grids, costmaps, lane graphs). As a pure coding
+question it's rarer than BFS/Dijkstra (it needs a problem-specific heuristic), but as a
+technical-discussion point in a mapping/autonomy role it's high-value.
+
+---
+
 ## Complexity
 
 **O(E log V)** time — each edge can push one heap entry, and heap ops are `log`. **O(V + E)** space
@@ -188,6 +234,8 @@ finalized      first POP of a node = its final shortest distance
 unreachable    node absent from dist  (or dist == inf)
 complexity     O(E log V)
 BFS vs this    equal weights -> BFS (O(V+E)); different weights -> Dijkstra
+A*             Dijkstra + heuristic: push f = g + h(node); stop at goal; h admissible (never overest);
+               h=0 => Dijkstra. Aims at ONE goal, expands fewer nodes. (robot/AV path planning)
 ```
 
 Read once, then drill from a blank file. It's BFS with a heap, a `dist` map, and one stale-check line.
