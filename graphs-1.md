@@ -139,42 +139,57 @@ shortest (fewest-edge) path. (This only holds for *unweighted* graphs — weight
 
 ---
 
-## 2. DFS — depth-first search (recursion or explicit stack)
+## 2. DFS — depth-first search (iterative stack)
 
-DFS dives as deep as possible before backtracking. It's the tool for **connectivity, cycle
-detection, and topological sort** (next page). Two forms:
-
-**Recursive** (clean, but watch Python's ~1000 recursion limit on deep graphs):
-
-```python
-def dfs(graph, node, visited):
-    visited.add(node)
-    for nxt in graph[node]:
-        if nxt not in visited:
-            dfs(graph, nxt, visited)
-```
-
-**Iterative** with an explicit stack (a list) — safe for deep graphs, mirrors what you'd do in C++
-to control stack depth:
+DFS dives as deep as possible before backtracking. It's the tool for **connectivity** and (with an
+ordering tweak) cycle detection. We use the **iterative** form with an explicit stack — no recursion,
+no recursion-limit worries, and it uses the **exact same discipline as BFS**: mark visited when you
+**add** to the container.
 
 ```python
 def dfs_iter(graph, start):
-    visited = set()
+    visited = {start}                 # mark the start; then mark each node WHEN PUSHED
     stack = [start]
+    order = []
     while stack:
         node = stack.pop()            # pop = top of stack -> LIFO (this is what makes it DFS)
-        if node in visited:
-            continue
-        visited.add(node)             # mark on POP for the iterative form
+        order.append(node)
         for nxt in graph[node]:
             if nxt not in visited:
+                visited.add(nxt)      # mark on PUSH -> a shared child is claimed once, no duplicates
                 stack.append(nxt)
-    return visited
+    return order
 ```
 
-**BFS vs DFS in one line:** same code shape, the *only* structural difference is the container —
-**queue (`popleft`) = BFS**, **stack (`pop`) = DFS**. BFS finds shortest unweighted paths; DFS is
-lighter for "is it connected / is there a cycle / order the nodes."
+Compare it line-for-line with `bfs()` above — they are **identical except for two things**:
+
+| | BFS | DFS |
+|---|---|---|
+| container | `deque` | `list` (stack) |
+| take from | `popleft()` (front, FIFO) | `pop()` (top, LIFO) |
+| mark visited | on **enqueue** | on **push** |
+
+So the single rule to memorize is: **mark visited the moment you add a node to the container.** Swap
+the queue for a stack and you've turned BFS into DFS. Nothing else changes.
+
+### Why `visited` exists at all (and when to mark)
+
+`visited` is needed *only* because a node can be reached **more than once** — a **shared child**
+(multiple parents) or a **cycle**. Take those away and you don't need it:
+
+- **Tree** → every node has exactly one parent, no cycles → **no `visited` needed.** A queue (BFS) or
+  stack (DFS) alone traverses it correctly.
+- **Graph** → nodes converge and loop → without `visited`, shared children get re-expanded and cycles
+  loop forever. `visited` is exactly what upgrades tree traversal into *graph* traversal.
+
+And you mark **when you add** (enqueue/push) so the *first* path to reach a shared child claims it
+immediately — every later parent then sees "already visited" and skips it, so nothing enters the
+container twice.
+
+> **Note on recursion:** DFS is often written recursively (`visited.add(node)` as the first line of a
+> `dfs(node)` function). It's shorter, but risks Python's ~1000-deep recursion limit and buries the
+> stack. For interviews focused on modeling + traversal, the iterative form above is the safe default
+> — reach for recursion only if a problem is much cleaner with it.
 
 ---
 
@@ -283,8 +298,9 @@ once. This is optimal; you cannot do better than looking at each node/edge once.
 represent      graph = defaultdict(list); graph[u].append(v)  (+append(v,u) if undirected)
 grid neighbors DIRS = [(-1,0),(1,0),(0,-1),(0,1)]; bounds-check 0<=nr<R and 0<=nc<C FIRST
 BFS  (queue)   deque; popleft; mark visited ON ENQUEUE; gives shortest UNWEIGHTED path
-DFS  (stack)   list; pop; recursion (raise recursionlimit) or explicit stack for deep graphs
-BFS vs DFS     same code, only the container differs: popleft=BFS, pop=DFS
+DFS  (stack)   list;  pop;     mark visited ON PUSH   (iterative, no recursion needed)
+BFS vs DFS     SAME code; mark-visited-on-ADD for both; only the container differs (popleft=BFS, pop=DFS)
+why visited    only needed for shared children / cycles; a tree needs none
 components     for node in range(n): if unvisited -> count += 1; flood-fill the group
 path exists?   one traversal from A; was B visited?
 visited key    a coordinate goes in the set as a TUPLE (r, c), never a list
