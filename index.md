@@ -30,7 +30,7 @@ Two columns, two axes:
 | 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ must-know | must-drill |
 | 4 | [Shortest path (Dijkstra)](shortest-path-dijkstra.html) | weighted routing with a min-heap frontier (+ A*) | likely | drill |
 | 5 | [Grid BFS / DFS](grid-bfs-dfs.html) | matrix as an implicit graph: shortest path, islands, flood fill, multi-source | likely | drill |
-| 6 | [Geometry / polylines](geometry-polylines.html) | points, polylines, point-to-segment, Chamfer (map-eval), merge intervals | likely | drill |
+| 6 | [Geometry / polylines](geometry-polylines.html) | points, polylines, point-to-segment, Chamfer (map-eval), merge intervals | mixed † | optional ‡ |
 | 7 | [Binary search](binary-search.html) | sorted arrays + search-on-answer-space | possible · foundation | must-drill |
 | 8 | [Two Pointers](two-pointers.html) | converging / slow-fast on (usually sorted) arrays | possible | optional |
 | 9 | [Sliding Window](sliding-window.html) | contiguous subarray/substring, grow/shrink window | possible | drill |
@@ -41,9 +41,15 @@ Two columns, two axes:
 topology**, so the graph family is the interview-day core. Arrays & Hashing is #1 because everything
 above is built on it (adjacency list = `defaultdict(list)`, `visited` = `set`).*
 
-*Drill budget (2 days out): spend it on **JD-core (2–6) ≥ Binary Search ≥ Sliding Window** first;
-Two Pointers / Stack / Heap are read-mostly. Binary search is only "possible" to appear but is
-**must-drill** because off-by-one boundary bugs are the classic cold-hands failure.*
+*† Geometry is **split-purpose**: point-to-segment + Chamfer are unlikely as a Wednesday **coding**
+problem (they're ML/domain primitives, not typical LeetCode) — their real value is **reading for the
+Thursday Mapping round** ("how do you score predicted vs GT lane geometry?"). ‡ The only cold-drill-worthy
+piece on that page is **merge intervals** ("sort by start, sweep"), a genuine DS&A pattern.*
+
+*Drill budget (2 days out): spend it on **JD-core graphs/grid (2–5) ≥ Binary Search ≥ Sliding Window**
+first; Two Pointers / Stack / Heap are read-mostly, and Geometry is read-for-Thursday (drill only
+merge-intervals if time). Binary search is only "possible" to appear but is must-drill because
+off-by-one boundary bugs are the classic cold-hands failure.*
 
 ---
 
