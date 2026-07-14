@@ -89,6 +89,26 @@ def dijkstra(n, edges, start):
    surfaces, `d > dist[node]` catches it and you `continue`. This is simpler than a decrease-key heap
    and is the standard Python idiom — **don't forget the stale check**, or you'll reprocess nodes.
 
+### Lazy deletion in action — the same node pushed twice
+
+Note: the heap is a **min-heap (priority queue)**, not a fully sorted list — it only guarantees the
+smallest element is on top. Because there's no decrease-key, a node can appear in the heap **multiple
+times with different distances**. Graph: `0→1 (5)`, `0→2 (1)`, `2→1 (1)`, start `0`:
+
+```
+push (0,0)
+pop  (0,0)  -> relax: dist[1]=5 push(5,1);  dist[2]=1 push(1,2)      heap=[(1,2),(5,1)]
+pop  (1,2)  -> d=1 == dist[2]=1 OK; relax 2->1: 1+1=2 < 5
+                dist[1]=2, push(2,1)                                  heap=[(2,1),(5,1)]  <- node 1 TWICE
+pop  (2,1)  -> d=2 == dist[1]=2 OK; finalize node 1 at distance 2     heap=[(5,1)]
+pop  (5,1)  -> d=5 >  dist[1]=2  -> STALE, skip                       heap=[]
+```
+
+Node `1` sits in the heap as both `(5,1)` and `(2,1)`. Two things cooperate: the heap's min-property
+makes the **better `(2,1)` pop first** (so the first pop of a node is final), and the **stale-skip**
+discards the leftover `(5,1)` when it surfaces (`5 > 2`). That's why no decrease-key is needed — we
+tolerate duplicates and filter them at pop time, trading a little heap space for much simpler code.
+
 ---
 
 ## 2. Worked example — Network Delay Time
