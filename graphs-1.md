@@ -41,17 +41,9 @@ Key choices to state out loud in an interview:
   graph[u].append((v, w))
   ```
 - **Grid as an implicit graph:** an R×C grid *is* a graph where each cell `(r, c)` is a node and its
-  neighbors are the 4 (or 8) adjacent cells. You don't build an adjacency list — you compute
-  neighbors on the fly (covered in the Grid page). Same BFS/DFS applies.
-
-```python
-# the 4-neighbor move set for grids (up/down/left/right)
-DIRS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-for dr, dc in DIRS:
-    nr, nc = r + dr, c + dc
-    if 0 <= nr < R and 0 <= nc < C:      # bounds check is the #1 grid gotcha
-        ...  # (nr, nc) is a neighbor
-```
+  neighbors are the 4 (or 8) adjacent cells. You don't build an adjacency list — the neighbors are
+  computed on the fly with a small move-set (see the Number of Islands example below, and the Grid
+  page). Same BFS/DFS applies.
 
 ---
 
