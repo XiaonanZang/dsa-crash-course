@@ -26,7 +26,7 @@ universal building block, but it's low here because this JD is graph-heavy.
 | 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ must-know |
 | 4 | [Shortest path (Dijkstra)](shortest-path-dijkstra.html) | weighted routing with a min-heap frontier (+ A*) | likely |
 | 5 | [Grid BFS / DFS](grid-bfs-dfs.html) | matrix as an implicit graph: shortest path, islands, flood fill, multi-source | likely |
-| 6 | Geometry / polylines | points, polylines, distances, merge intervals | likely |
+| 6 | [Geometry / polylines](geometry-polylines.html) | points, polylines, point-to-segment, Chamfer (map-eval), merge intervals | likely |
 | 7 | Binary search | sorted arrays + search-on-answer-space | review |
 | 8 | Heap / top-k | `heapq`, k-largest, k-closest, merge-k | review |
 
