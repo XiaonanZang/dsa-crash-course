@@ -14,23 +14,25 @@ built on arrays and hashing, so those come first as the substrate.
 
 ## Roadmap
 
-| # | Pattern | What it covers | Priority |
+The **Likelihood** column is the odds this shows up in *this* (mapping/autonomy) interview — it runs
+top-to-bottom with the reading order. It is **not** a topic's general importance: binary search is a
+universal building block, but it's low here because this JD is graph-heavy.
+
+| # | Pattern | What it covers | Likelihood (this JD) |
 |---|---|---|---|
-| 0 | [C++ → Python cheat sheet](cpp-to-python.html) | Translate DS&A muscle memory from C++ to Python idioms | start here |
-| 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | foundation |
-| 2 | [Graphs I — traversal & connected components](graphs-1.html) | adjacency list, `visited`, BFS/DFS, components, islands | ⭐ core |
-| 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ core |
-| 4 | [Shortest path (Dijkstra)](shortest-path-dijkstra.html) | weighted routing with a min-heap frontier | core |
-| 5 | [Grid BFS / DFS](grid-bfs-dfs.html) | matrix as an implicit graph: shortest path, islands, flood fill, multi-source | core |
-| 6 | Geometry / polylines | points, polylines, distances, merge intervals | high |
-| 7 | Binary search | sorted arrays + search-on-answer-space | foundation |
-| 8 | Heap / top-k | `heapq`, k-largest, k-closest, merge-k | high |
+| 0 | [C++ → Python cheat sheet](cpp-to-python.html) | Translate DS&A muscle memory from C++ to Python idioms | reference |
+| 1 | [Arrays & Hashing](arrays-hashing.html) | `dict` / `set` / `Counter`, frequency, dedup, two-sum family | must-know · prereq |
+| 2 | [Graphs I — traversal & connected components](graphs-1.html) | adjacency list, `visited`, BFS/DFS, components, islands | ⭐ must-know |
+| 3 | [Topological sort](topological-sort.html) | dependency ordering on a DAG, cycle detection (Kahn + DFS) | ⭐ must-know |
+| 4 | [Shortest path (Dijkstra)](shortest-path-dijkstra.html) | weighted routing with a min-heap frontier (+ A*) | likely |
+| 5 | [Grid BFS / DFS](grid-bfs-dfs.html) | matrix as an implicit graph: shortest path, islands, flood fill, multi-source | likely |
+| 6 | Geometry / polylines | points, polylines, distances, merge intervals | likely |
+| 7 | Binary search | sorted arrays + search-on-answer-space | review |
+| 8 | Heap / top-k | `heapq`, k-largest, k-closest, merge-k | review |
 
-*Order reflects the mapping/autonomy JD: lane/road-network **graph construction, connectivity, and
-topology** are the interview-day core, so graphs lead.*
-
-*Foundations (arrays/hashing, binary search) appear in almost every problem; the graph family is
-the interview-day core when the domain is networks and topology.*
+*Why graphs lead: the JD centers on lane/road-network **graph construction, connectivity, and
+topology**, so the graph family is the interview-day core. Arrays & Hashing is #1 because everything
+above is built on it (adjacency list = `defaultdict(list)`, `visited` = `set`).*
 
 ---
 
