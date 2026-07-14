@@ -78,6 +78,43 @@ in-degree 0 and lands in `order`, so `len(order) == n`. If there's a cycle, the 
 can *never* reach in-degree 0 (they forever wait on each other), so they never get enqueued and
 `len(order) < n`. **A short order = a cycle.** You get cycle detection with no extra code.
 
+### If nodes aren't labeled `0..n-1` — use a dict
+
+`indeg = [0] * n` is a shortcut that works **only because the nodes are integers `0..n-1`** (the
+label *is* the index). It quietly does double duty: it counts in-degrees **and** `range(n)` enumerates
+every node, including the roots that have no incoming edges. For arbitrary labels (strings, sparse
+ids) switch to a `defaultdict(int)` — but then you must supply the **full node set** separately:
+
+```python
+from collections import defaultdict, deque
+
+def topo_sort(nodes, edges):          # nodes = the complete set of labels
+    graph = defaultdict(list)
+    indeg = defaultdict(int)
+    for u, v in edges:                # edge u -> v
+        graph[u].append(v)
+        indeg[v] += 1
+
+    # seed with EVERY node whose in-degree is 0 -- scan all nodes, not indeg's keys:
+    # a source-only root never appears as a `v`, so it's NOT a key in indeg
+    queue = deque([x for x in nodes if indeg[x] == 0])
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for nxt in graph[node]:
+            indeg[nxt] -= 1
+            if indeg[nxt] == 0:
+                queue.append(nxt)
+
+    return order if len(order) == len(nodes) else []   # cycle check now vs len(nodes)
+```
+
+Two watch-outs: the cycle check becomes **`len(order) == len(nodes)`** (no integer `n` anymore), and
+`indeg[x] == 0` on a `defaultdict(int)` *inserts* `x` as a side effect — use `indeg.get(x, 0)` if you
+want to avoid that. So: **integer nodes `0..n-1` → `[0]*n`; arbitrary labels → `defaultdict(int)` plus
+a full node set.** The list is just the special case where the labels are the indices.
+
 ---
 
 ## 2. Worked example — Course Schedule II
