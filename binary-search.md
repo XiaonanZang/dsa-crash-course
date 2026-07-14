@@ -104,6 +104,45 @@ other common template — `while lo < hi` with `hi = mid` — which converges on
 smallest feasible value) rather than an exact match. Tell for this pattern: "minimize/maximize X such
 that a condition holds."
 
+### Why `lo <= hi` here but `lo < hi` there (the part everyone trips on)
+
+The `<=` vs `<` choice is **not free**. It is forced by whether your shrink step moves *past* `mid` or
+*keeps* `mid`. Get this and every off-by-one bug disappears.
+
+**The two templates answer different questions:**
+
+- **Template A (`lo <= hi`, `mid ± 1`)** asks *"is this exact element present, yes or no?"* Every index
+  is a candidate you **check and reject**. When `nums[mid]` is not the target, `mid` is done, so you
+  discard it with `lo = mid + 1` or `hi = mid - 1`. The target may not exist; the range shrinks to
+  empty and you return `-1`.
+- **Template B (`lo < hi`, `hi = mid`)** asks *"where is the boundary between fails and works?"* The
+  answer is **guaranteed to exist** in the range (you set `hi` to a value that always works, e.g.
+  `max(piles)`). So when `mid` is feasible, `mid` **might itself be the answer**, and you cannot throw
+  it away. You keep it with `hi = mid`.
+
+**The loop condition is then forced by one question: does the shrink step always make progress?**
+
+- `lo = mid + 1` / `hi = mid - 1` **always** move past `mid`, so progress is guaranteed and `lo <= hi`
+  is safe. When `lo == hi` there is still exactly **one** unchecked element (`[lo, hi]` with `lo == hi`
+  is one slot) and you *want* to check it. Using `<` here would **skip that last element**.
+- `hi = mid` does **not** move past `mid`. Watch the range of two, `lo` and `hi = lo + 1`:
+  `mid = lo + (hi - lo)//2 = lo`. If feasible, `hi = mid = lo`, now `lo == hi`, done.
+  But **if you had written `lo <= hi`**, the loop continues with `lo == hi == mid`, feasible again,
+  `hi = mid = lo`, nothing changes, **infinite loop**. So `hi = mid` **requires** `lo < hi`. The moment
+  `lo == hi` the range has collapsed to one value, and because you never discarded the answer, that one
+  value **is** the answer: stop and `return lo`.
+
+| Shrink step | Moves past mid? | Loop condition | Why |
+|---|---|---|---|
+| `lo=mid+1` / `hi=mid-1` (reject mid) | yes, always | `lo <= hi` | must still check the final single element |
+| `hi = mid` (keep mid) | no | `lo < hi` | `<=` would spin forever on the last element |
+
+**Mental model:** Template A **rejects** `mid` every step and may find nothing. Template B **keeps**
+`mid` as a live candidate and squeezes the window until it is one cell wide, and the answer always
+survives. Reject → `mid ± 1` → `<=`. Keep → `hi = mid` → `<`. Mixing them (`hi = mid` with `<=`, or
+`mid - 1` with `<`) is exactly how you infinite-loop or skip the answer, which is why you trust **one**
+of each template and never blend.
+
 ---
 
 ## Complexity
