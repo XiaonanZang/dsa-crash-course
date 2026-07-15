@@ -510,6 +510,63 @@ def product_except_self(nums):
 
 ---
 
+## 7. Sparse Matrix — dict-of-keys (construct / add / multiply)
+
+> **Problem:** A large matrix is **mostly zeros**. Store it efficiently, then support **addition** and
+> **multiplication** of two such matrices. Return results in the same compact form.
+
+The payoff of Section 0's tuple-keyed dict: represent an `m×n` grid that's 99% zeros as a
+`{(row, col): value}` map storing **only the nonzeros** — memory becomes O(nonzeros), not O(m·n). It's
+a pure data-structure problem: the storage choice cascades into how clean add and multiply are.
+Sparse matrices are everywhere in this domain — an **adjacency matrix is a sparse matrix**, and so are
+ML feature matrices.
+
+**Construct — the map:**
+```python
+def to_sparse(matrix):
+    data = {}                                  # {(r, c): value} -- nonzeros only
+    for r, row in enumerate(matrix):
+        for c, val in enumerate(row):
+            if val != 0:
+                data[(r, c)] = val
+    return data
+```
+
+**Add — iterate the UNION of nonzero cells:**
+```python
+def add(A, B):                                 # A, B same dimensions
+    result = {}
+    for key in A.keys() | B.keys():            # only cells nonzero in AT LEAST one matrix
+        s = A.get(key, 0) + B.get(key, 0)
+        if s != 0:                             # a sum can CANCEL to zero -> don't store it
+            result[key] = s
+    return result
+```
+The subtle correctness point most people miss: **drop cells that sum to zero**, or your "sparse" matrix
+silently fills with explicit zeros.
+
+**Multiply — align A's columns to B's rows (the crux):**
+```python
+from collections import defaultdict
+
+def multiply(A, B):                            # A is m×k, B is k×n
+    B_by_row = defaultdict(list)               # index B by its row: {x: [(j, val), ...]}
+    for (x, j), v in B.items():
+        B_by_row[x].append((j, v))
+
+    result = defaultdict(int)
+    for (i, x), a in A.items():                # each nonzero A[i][x]
+        for (j, b) in B_by_row[x]:             # only B-entries in the MATCHING row x
+            result[(i, j)] += a * b            # accumulate the sum-of-products
+    return {k: v for k, v in result.items() if v != 0}
+```
+`A[i][x] * B[x][j]` is nonzero only when both exist **and share the index `x`** (A's column = B's row).
+Grouping B by row `x` turns "find all B-entries that pair with this A-entry" into an O(1) dict lookup, so
+you only ever multiply pairs that actually contribute — never touching a zero. Same drop-the-zeros
+discipline on the way out. This is the `scipy.sparse` idea (dict-of-keys / CSR) in miniature.
+
+---
+
 ## Complexity at a glance
 
 | Operation | `list` | `dict` / `set` |
@@ -533,6 +590,7 @@ count by hand        d[c] = d.get(c, 0) + 1
 bucket by key        g = defaultdict(list); g[key].append(x)         # Group Anagrams
 top-k                Counter(v).most_common(k)                       # Top K Frequent
 prefix/suffix pass   left pass then right pass, O(1) space           # Product Except Self
+sparse matrix        {(r,c): v} nonzeros; add=union+drop-zeros; mul=index B by row  # dict-of-keys
 reverse loop         for i in range(n-1, -1, -1):
 index + value        for i, x in enumerate(v):
 ```
