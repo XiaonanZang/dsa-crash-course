@@ -71,6 +71,51 @@ bisect.bisect_right(nums, x)   # rightmost such index (first > x)
 
 In an interview, writing the loop shows you understand it; `bisect` is the fast path if allowed.
 
+### Worked example — Find First and Last Position of Element in Sorted Array
+
+> **Problem:** Given a sorted `nums` and a `target`, return `[first, last]` — the first and last index of
+> `target`, or `[-1, -1]` if it's absent. Must be **O(log n)**.
+
+The whole problem is the bounds template run **twice** — once shrinking left (first), once shrinking right
+(last). Do **not** try to detect the boundary by looking at `nums[mid+1]`; that needs a special case per
+edge (target at index 0, target at the end, single element, all-equal) and leaks on absent targets. The
+**record-and-shrink** template handles every one of those with zero special cases:
+
+```python
+def search_range(nums, target):
+    def bound(find_first):
+        lo, hi = 0, len(nums) - 1
+        ans = -1                              # default -1 IS the existence check
+        while lo <= hi:                       # <= : with mid±1 moves, must check the final cell
+            mid = lo + (hi - lo) // 2         # recompute EVERY iteration (or you infinite-loop)
+            if nums[mid] == target:
+                ans = mid                     # record a hit...
+                if find_first:
+                    hi = mid - 1              # ...then keep going LEFT for an earlier one
+                else:
+                    lo = mid + 1              # ...or RIGHT for a later one
+            elif nums[mid] < target:
+                lo = mid + 1
+            else:
+                hi = mid - 1
+        return ans
+    return [bound(True), bound(False)]
+```
+
+Why this is robust where transition-detection is fragile:
+
+- **Absent target → `[-1, -1]` for free.** If `target` is never matched, `ans` stays `-1`. No separate
+  "is it in range?" guard — and note a range check (`nums[0] > t or nums[-1] < t`) does **not** catch a
+  value that falls in a *gap* (`6` in `[5,7,8,10]`); the search itself must decide presence.
+- **Edges need no special case.** Target at index 0, at the end, a single element, or an all-equal array
+  all fall out of the same loop, because the loop converges to the boundary rather than hunting for an
+  adjacency.
+- **The three consistency rules hold:** `mid` recomputed inside the loop; `mid ± 1` moves (reject-mid);
+  `while lo <= hi`. Mixing `mid ± 1` with `while lo < hi` quits one cell early and skips the final element
+  (the classic first/last-occurrence bug). `mid ± 1` pairs with `<=`, always.
+
+Complexity: two O(log n) searches → **O(log n)** total, O(1) space.
+
 ---
 
 ## 3. Binary search on the answer (the powerful one)
