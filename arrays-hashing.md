@@ -565,6 +565,69 @@ Grouping B by row `x` turns "find all B-entries that pair with this A-entry" int
 you only ever multiply pairs that actually contribute — never touching a zero. Same drop-the-zeros
 discipline on the way out. This is the `scipy.sparse` idea (dict-of-keys / CSR) in miniature.
 
+**Class form — bundle state with the ops:**
+
+The three functions share the same `data` map, so the natural next step is a class. State (`data` + shape)
+travels with the object, add/multiply return a properly-shaped `SparseMatrix`, and the drop-zeros rule now
+lives in the `set` mutator too.
+
+```python
+from collections import defaultdict
+
+class SparseMatrix:
+    def __init__(self, matrix=None, rows=0, cols=0):
+        self.data = {}                       # {(r, c): value} -- nonzeros only
+        if matrix is not None:               # build from a dense 2D list
+            self.rows = len(matrix)
+            self.cols = len(matrix[0]) if matrix else 0
+            for r, row in enumerate(matrix):
+                for c, val in enumerate(row):
+                    if val != 0:
+                        self.data[(r, c)] = val
+        else:                                # or start empty with known shape
+            self.rows, self.cols = rows, cols
+
+    def get(self, r, c):
+        return self.data.get((r, c), 0)      # missing key == 0
+
+    def set(self, r, c, val):
+        if val != 0:
+            self.data[(r, c)] = val
+        else:
+            self.data.pop((r, c), None)      # setting to 0 must REMOVE, not store a 0
+
+    def add(self, other):                    # same dimensions
+        out = SparseMatrix(rows=self.rows, cols=self.cols)
+        for key in self.data.keys() | other.data.keys():   # union of nonzero cells
+            s = self.get(*key) + other.get(*key)
+            if s != 0:                       # a sum can CANCEL to zero -> don't store it
+                out.data[key] = s
+        return out
+
+    def multiply(self, other):               # self is m×k, other is k×n
+        out = SparseMatrix(rows=self.rows, cols=other.cols)
+        B_by_row = defaultdict(list)         # index other by its row: {x: [(j, val), ...]}
+        for (x, j), v in other.data.items():
+            B_by_row[x].append((j, v))
+        acc = defaultdict(int)
+        for (i, x), a in self.data.items():  # each nonzero A[i][x]
+            for (j, b) in B_by_row[x]:       # only B-entries in the MATCHING row x
+                acc[(i, j)] += a * b
+        out.data = {k: v for k, v in acc.items() if v != 0}
+        return out
+
+    def to_dense(self):                      # back to dense for printing / tests
+        grid = [[0] * self.cols for _ in range(self.rows)]
+        for (r, c), v in self.data.items():
+            grid[r][c] = v
+        return grid
+```
+
+Two things the class buys you: `set(r, c, 0)` must **`pop`** the key (not store a zero — same drop-zeros
+discipline, now on the mutator), and `self.get(*key)` **star-unpacks** the `(r, c)` tuple into two args
+(`self.get(key)` would pass the tuple whole and break). Keep add/multiply **pure** (return a new matrix,
+mutate nothing); offer an in-place variant only as the follow-up optimization.
+
 ---
 
 ## Complexity at a glance
